@@ -1,0 +1,6 @@
+Copia aquí el fichero p2-telemetria.jar descargado de Moodle
+y añádelo al Build Path de Eclipse (clic derecho sobre el proyecto
+→ Build Path → Configure Build Path → Libraries → Add JARs).
+
+El fichero .gitignore excluye los JAR de este directorio para que
+no se suban al repositorio.

@@ -1,0 +1,15 @@
+# Compilados — no forman parte del código fuente
+bin/
+*.class
+
+# JAR de la biblioteca — se copia a mano en lib/
+lib/*.jar
+
+# Grabaciones JFR — pueden ocupar decenas de megabytes
+*.jfr
+
+# Configuración local de Eclipse — puede contener rutas absolutas
+.settings/
+
+# macOS
+.DS_Store
