@@ -4,6 +4,9 @@ import java.util.concurrent.Semaphore;
 
 import ssoo.telemetría.estación.Receptor;
 import ssoo.telemetría.panel.PanelVisualizador;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Servidor de telemetría — versión secuencial de partida.
@@ -37,13 +40,12 @@ public class ServidorTelemetría {
 
         //Pool de hilos en base a la cantidad de proccesos de mi CPU
         final int max = Runtime.getRuntime().availableProcessors();
-        Thread[] hilos = new Thread[max];
+        ExecutorService executor = Executors.newFixedThreadPool(max);
 
         for (int i = 0; i < max; i++) {
-            hilos[i] = new Thread(new HiloAnalizador(cola, estadísticas));
-            hilos[i].setName("Hilo Analizador- " + i);
-            hilos[i].start();
+            executor.execute(new HiloAnalizador(cola, estadísticas));
         }
+
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
@@ -56,15 +58,16 @@ public class ServidorTelemetría {
                 // 2. Esperar a que terminen todas las peticiones
                 semaforo.acquire(20);
 
-                // 3. Enviar una píldora por analizador
-                for (int i = 0; i < hilos.length; i++) {
+                // Enviar una píldora venenosa por analizador
+                for (int i = 0; i < max; i++) {
                     cola.encolarTrabajo(new Trabajo());
                 }
 
-                // 4. Esperar a que terminen los analizadores
-                for (Thread hilo : hilos) {
-                    hilo.join();
-                }
+                // Indicar al executor que debe cerrarse
+                executor.shutdown();
+
+                // Esperar a que terminen todos los analizadores
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
                 // 5. Mostrar estadísticas finales
                 System.out.println("Servidor detenido.");
