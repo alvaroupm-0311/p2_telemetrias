@@ -1,5 +1,7 @@
 package ssoo.servidor;
 
+import java.util.concurrent.Semaphore;
+
 import ssoo.telemetría.estación.Receptor;
 import ssoo.telemetría.panel.PanelVisualizador;
 
@@ -23,7 +25,11 @@ public class ServidorTelemetría {
         Estadísticas estadísticas = new Estadísticas();
         ColaDeTrabajos cola = new ColaDeTrabajos(20);
         PanelVisualizador.getPanel().registrarColaTrabajos(cola);
-        Thread hilo_receptor = new Thread(new HiloReceptor(receptor, estadísticas,cola));
+
+        //Semaforo
+        Semaphore semaforo = new Semaphore(20);
+
+        Thread hilo_receptor = new Thread(new HiloReceptor(receptor, estadísticas,cola, semaforo));
         hilo_receptor.start();
 
         //Pool de hilos en base a la cantidad de proccesos de mi CPU

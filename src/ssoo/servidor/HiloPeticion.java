@@ -2,6 +2,7 @@ package ssoo.servidor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import ssoo.telemetría.Encargo;
 import ssoo.telemetría.Informe;
@@ -14,13 +15,15 @@ public class HiloPeticion extends Thread{
     private final Petición p;
     private final Estadísticas e;
     private final ColaDeTrabajos colilla;
+    private final Semaphore sp;
 
     public HiloPeticion(Petición petición, Estadísticas estadísticas, 
-        ColaDeTrabajos colita){
+        ColaDeTrabajos colita, Semaphore s){
         super("Petición-" + petición.getEncargo().getTítulo()); // nombre en los volcados
         p = petición;
         e = estadísticas;
         colilla = colita;
+        sp = s;
     }
 
     @Override
@@ -50,6 +53,8 @@ public class HiloPeticion extends Thread{
 
         } catch (InterruptedException e1) {
             e1.printStackTrace();
+        } finally{
+            sp.release(); //incrementa el numero del semaforo
         }
 
 
