@@ -35,6 +35,10 @@ public class HiloReceptor implements Runnable {
                 if(!activo)
                     return ;
                 s.acquire(); //Reduce en 1 el numero del semaforo
+                if (!activo) {
+                     s.release();
+                     break;
+                }
                 Thread hilo_peticion = new HiloPeticion(petición, e, colita, s);
                 hilo_peticion.start();
                 }
@@ -45,7 +49,6 @@ public class HiloReceptor implements Runnable {
             catch (InterruptedException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
-                s.release();//incrementa el numero del semaforo
             }
 	}
     
