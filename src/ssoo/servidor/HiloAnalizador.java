@@ -19,8 +19,12 @@ public class HiloAnalizador implements Runnable{
         try {
             while(true){
                 Trabajo t = colita.extraerTrabajo();
-                e.registrarTelemetría();
+
+                if (t.esVenenoso())
+                    return;
+
                 t.setTelemetríaAnalizada(a.analizar(t.getTelemetriaOriginal()));
+                e.registrarTelemetría();
             }
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block

@@ -29,7 +29,10 @@ public class ServidorTelemetría {
         //Semaforo
         Semaphore semaforo = new Semaphore(20);
 
-        Thread hilo_receptor = new Thread(new HiloReceptor(receptor, estadísticas,cola, semaforo));
+        //Guardo referencia del hilo Receptor
+        HiloReceptor hR = new HiloReceptor(receptor, estadísticas,cola, semaforo);
+
+        Thread hilo_receptor = new Thread(hR);
         hilo_receptor.start();
 
         //Pool de hilos en base a la cantidad de proccesos de mi CPU
@@ -41,6 +44,36 @@ public class ServidorTelemetría {
             hilos[i].setName("Hilo Analizador- " + i);
             hilos[i].start();
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                System.out.println("Iniciando cierre ordenado...");
+
+                // 1. Impedir nuevas peticiones
+                hR.detener();
+                hilo_receptor.interrupt();
+
+                // 2. Esperar a que terminen todas las peticiones
+                semaforo.acquire(20);
+
+                // 3. Enviar una píldora por analizador
+                for (int i = 0; i < hilos.length; i++) {
+                    cola.encolarTrabajo(new Trabajo());
+                }
+
+                // 4. Esperar a que terminen los analizadores
+                for (Thread hilo : hilos) {
+                    hilo.join();
+                }
+
+                // 5. Mostrar estadísticas finales
+                System.out.println("Servidor detenido.");
+                estadísticas.mostrar();
+
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }));
 
     }
 }

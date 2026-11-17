@@ -6,6 +6,7 @@ public class Trabajo {
 
     private final Telemetría t_original;
     private Telemetría t_analizada;
+    private boolean venenoso;
 
     public Trabajo (Telemetría telemetría){
 
@@ -13,6 +14,16 @@ public class Trabajo {
         t_analizada = null;
 
     }
+    //Metodos para la <<pildora venenosa>>
+    public Trabajo (){
+        t_original = null;
+        t_analizada = null;
+        venenoso = true;
+    }
+    public boolean esVenenoso(){
+        return venenoso;
+    }
+
 
     //Obtener para hilo Analizador la telemetría original
     public Telemetría getTelemetriaOriginal(){

@@ -12,6 +12,7 @@ public class HiloReceptor implements Runnable {
     private final Estadísticas e;
     private final ColaDeTrabajos colita;
     private final Semaphore s;
+    private volatile boolean activo = true;
 
     public HiloReceptor(Receptor receptor, Estadísticas estadísticas,
          ColaDeTrabajos cola, Semaphore semaforo){
@@ -21,12 +22,18 @@ public class HiloReceptor implements Runnable {
         colita = cola;
         s = semaforo;
     }
+    //Como esta activo, usar metodo para detener
+    public void detener() {
+        activo = false;
+    }
 
 	@Override
 	public void run() {
         try {
-            while(true){
+            while(activo){
                 Petición petición = r.recibirPetición();
+                if(!activo)
+                    return ;
                 s.acquire(); //Reduce en 1 el numero del semaforo
                 Thread hilo_peticion = new HiloPeticion(petición, e, colita, s);
                 hilo_peticion.start();
