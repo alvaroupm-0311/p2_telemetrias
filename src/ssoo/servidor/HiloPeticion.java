@@ -35,7 +35,6 @@ public class HiloPeticion extends Thread{
         for (Telemetría t : encargo.getTelemetrías()) {
             trabajo = new Trabajo(t);
             trabajos.add(trabajo);
-            e.registrarTelemetría();
             colilla.encolarTrabajo(trabajo);
         }
         List<Telemetría> analizadas = new ArrayList<>();

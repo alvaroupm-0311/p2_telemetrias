@@ -26,10 +26,12 @@ public class ServidorTelemetría {
         Thread hilo_receptor = new Thread(new HiloReceptor(receptor, estadísticas,cola));
         hilo_receptor.start();
 
-        Thread[] hilos = new Thread[8];
+        //Pool de hilos en base a la cantidad de proccesos de mi CPU
+        final int max = Runtime.getRuntime().availableProcessors();
+        Thread[] hilos = new Thread[max];
 
-        for (int i = 0; i < 8; i++) {
-            hilos[i] = new Thread(new HiloAnalizador(cola));
+        for (int i = 0; i < max; i++) {
+            hilos[i] = new Thread(new HiloAnalizador(cola, estadísticas));
             hilos[i].setName("Hilo Analizador- " + i);
             hilos[i].start();
         }
